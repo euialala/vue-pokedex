@@ -1,13 +1,20 @@
+
 <template>
-  <header class="cabecalho">
-    <RouterLink to="/" class="logo">
-      <span>Poké</span>Dex
-    </RouterLink>
+  <div class="app">
+    <header class="cabecalho">
+      <RouterLink to="/" class="logo">
+        Poké<span>Dex</span>
+      </RouterLink>
 
-    <span class="subtitulo">Explore o mundo Pokémon</span>
-  </header>
+      <span class="subtitulo">Seu guia do mundo Pokémon</span>
+    </header>
 
-  <main>
-    <RouterView />
-  </main>
+    <main>
+      <RouterView />
+    </main>
+
+    <footer class="rodape">
+      Pokédex desenvolvida com Vue 3 e PokéAPI
+    </footer>
+  </div>
 </template>

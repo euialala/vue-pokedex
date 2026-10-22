@@ -1,53 +1,79 @@
+
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
-import { useRoute } from 'vue-router'
-import api from '../services/api'
+import { ref, watch } from 'vue'
+import api from '../../services/api'
 
 interface PokemonDetalhe {
   id: number
   name: string
   height: number
   weight: number
-  types: { type: { name: string } }[]
-  stats: {
-    base_stat: number
-    stat: { name: string }
-  }[]
   sprites: {
     other: {
       'official-artwork': {
         front_default: string | null
       }
     }
+    front_default: string | null
   }
+  types: {
+    type: {
+      name: string
+    }
+  }[]
+  stats: {
+    base_stat: number
+    stat: {
+      name: string
+    }
+  }[]
 }
 
-const route = useRoute()
+const props = defineProps<{
+  id: string
+}>()
+
 const pokemon = ref<PokemonDetalhe | null>(null)
 const carregando = ref(true)
 const erro = ref('')
 
-onMounted(async () => {
-  try {
-    const resposta = await api.get(
-      `pokemon/${route.params.id}`
-    )
+watch(
+  () => props.id,
+  async (id) => {
+    carregando.value = true
+    erro.value = ''
+    pokemon.value = null
 
-    pokemon.value = resposta.data
-  } catch {
-    erro.value = 'Não foi possível encontrar esse Pokémon.'
-  } finally {
-    carregando.value = false
-  }
-})
+    try {
+      const resposta = await api.get(`pokemon/${id}`)
+      pokemon.value = resposta.data
+    } catch {
+      erro.value = 'Não foi possível encontrar esse Pokémon.'
+    } finally {
+      carregando.value = false
+    }
+  },
+  { immediate: true }
+)
 
 function formatarNome(nome: string) {
   return nome
     .split('-')
-    .map(palavra =>
-      palavra.charAt(0).toUpperCase() + palavra.slice(1)
-    )
+    .map((palavra) => palavra.charAt(0).toUpperCase() + palavra.slice(1))
     .join(' ')
+}
+
+function nomeAtributo(nome: string) {
+  const nomes: Record<string, string> = {
+    hp: 'Vida',
+    attack: 'Ataque',
+    defense: 'Defesa',
+    'special-attack': 'Ataque especial',
+    'special-defense': 'Defesa especial',
+    speed: 'Velocidade'
+  }
+
+  return nomes[nome] || formatarNome(nome)
 }
 </script>
 
@@ -57,30 +83,36 @@ function formatarNome(nome: string) {
       ← Voltar para a Pokédex
     </RouterLink>
 
-    <p v-if="carregando" class="mensagem">
-      Carregando detalhes...
-    </p>
+    <div v-if="carregando" class="estado">
+      <div class="spinner"></div>
+      <p>Carregando informações...</p>
+    </div>
 
-    <p v-else-if="erro" class="mensagem">
-      {{ erro }}
-    </p>
+    <div v-else-if="erro" class="estado">
+      <p>{{ erro }}</p>
+      <RouterLink to="/" class="botao">
+        Voltar para Home
+      </RouterLink>
+    </div>
 
-    <div v-else-if="pokemon" class="painel-pokemon">
+    <article v-else-if="pokemon" class="painel-pokemon">
       <div class="imagem-pokemon">
         <span class="numero">
           #{{ String(pokemon.id).padStart(3, '0') }}
         </span>
 
         <img
-          :src="pokemon.sprites.other['official-artwork'].front_default
-            || `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemon.id}.png`"
+          :src="
+            pokemon.sprites.other['official-artwork'].front_default ||
+            pokemon.sprites.front_default ||
+            ''
+          "
           :alt="pokemon.name"
         />
       </div>
 
       <div class="informacoes">
-        <p class="etiqueta">DETALHES DO POKÉMON</p>
-
+        <span class="etiqueta">FICHA DO POKÉMON</span>
         <h1>{{ formatarNome(pokemon.name) }}</h1>
 
         <div class="tipos">
@@ -88,6 +120,7 @@ function formatarNome(nome: string) {
             v-for="item in pokemon.types"
             :key="item.type.name"
             class="tipo"
+            :class="`tipo-${item.type.name}`"
           >
             {{ formatarNome(item.type.name) }}
           </span>
@@ -108,25 +141,25 @@ function formatarNome(nome: string) {
         <h2>Atributos base</h2>
 
         <div
-          v-for="stat in pokemon.stats"
-          :key="stat.stat.name"
+          v-for="item in pokemon.stats"
+          :key="item.stat.name"
           class="atributo"
         >
           <div class="atributo-cabecalho">
-            <span>{{ formatarNome(stat.stat.name) }}</span>
-            <strong>{{ stat.base_stat }}</strong>
+            <span>{{ nomeAtributo(item.stat.name) }}</span>
+            <strong>{{ item.base_stat }}</strong>
           </div>
 
           <div class="barra">
             <div
               class="barra-preenchida"
               :style="{
-                width: `${Math.min(stat.base_stat / 255 * 100, 100)}%`
+                width: `${Math.min(item.base_stat / 255 * 100, 100)}%`
               }"
             ></div>
           </div>
         </div>
       </div>
-    </div>
+    </article>
   </section>
 </template>
