@@ -1,23 +1,12 @@
-
 import { createRouter, createWebHistory } from 'vue-router'
-
-import HomeView from '../components/produtos/HomeView.vue'
-import PokemonView from '../components/produtos/PokemonView.vue'
+import HomeView from '../components/view/HomeView.vue'
+import PokemonView from '../components/view/PokemonView.vue'
 
 const router = createRouter({
   history: createWebHistory(),
   routes: [
-    {
-      path: '/',
-      name: 'home',
-      component: HomeView
-    },
-    {
-      path: '/pokemon/:id',
-      name: 'pokemon',
-      component: PokemonView,
-      props: true
-    }
+    { path: '/', component: HomeView },
+    { path: '/pokemon/:id', component: PokemonView, props: true }
   ]
 })
 
