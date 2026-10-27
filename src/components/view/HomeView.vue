@@ -52,6 +52,23 @@ onMounted(carregarPokemon)
       <p>Encontre seus Pokémon favoritos e descubra suas informações.</p>
     </div>
 
+    
+<header class="header">
+  <div class="logo">Poké<span>Dex</span></div>
+
+  <div class="header-links">
+    <RouterLink to="/login" class="login-link">
+      Login
+    </RouterLink>
+
+    <RouterLink to="/register" class="register-link">
+      Cadastrar
+    </RouterLink>
+  </div>
+</header>
+
+
+
     <input
       v-model="pesquisa"
       class="pesquisa"
@@ -86,3 +103,5 @@ onMounted(carregarPokemon)
     />
   </section>
 </template>
+
+

@@ -367,3 +367,34 @@ main {
     max-height: 250px;
   }
 }
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 24px;
+  background: white;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.header-links {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.login-link {
+  color: #252b36;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.register-link {
+  background: #e3350d;
+  color: white;
+  padding: 10px 16px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 600;
+}
